@@ -7,9 +7,11 @@ import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 @RestController
 @Slf4j
@@ -20,9 +22,10 @@ public class FilmController {
     private int nextId = 1;
 
     @PostMapping
-    public Film createFilm(@RequestBody Film film, HttpServletRequest request) {
+    public Film createFilm(@Valid @RequestBody Film film, HttpServletRequest request) {
         if (filmIsValid(film)) {
-            film.setId(getNextId());
+            film.setId(nextId);
+            nextId++;
             films.put(film.getId(), film);
         }
         log.info("Получен запрос к эндпоинту: '{} {}', Добавлен фильм: '{}'",
@@ -31,11 +34,13 @@ public class FilmController {
     }
 
     @PutMapping
-    public Film changedFilm(@RequestBody Film film) {
+    public Film changedFilm(@Valid @RequestBody Film film, HttpServletRequest request) {
         if (filmIsValid(film)) {
             if (films.containsKey(film.getId())) {
                 films.remove(film.getId());
                 films.put(film.getId(), film);
+                log.info("Получен запрос к эндпоинту: '{} {}', Изменен фильм: '{}'",
+                        request.getMethod(), request.getRequestURI(), film);
                 return film;
             } else {
                 throw new NotFoundException("Id not found");
@@ -45,7 +50,7 @@ public class FilmController {
     }
 
     @GetMapping
-    public ArrayList<Film> getFilms() {
+    public List<Film> getFilms() {
         return new ArrayList<>(films.values());
     }
 
@@ -64,10 +69,6 @@ public class FilmController {
         } else {
             return true;
         }
-    }
-
-    private int getNextId(){
-        return nextId++;
     }
 }
 

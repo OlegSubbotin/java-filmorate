@@ -1,15 +1,20 @@
 package ru.yandex.practicum.filmorate.controllers;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 @RestController
+@Slf4j
 @RequestMapping("/users")
 public class UserController {
 
@@ -17,23 +22,30 @@ public class UserController {
     private int nextId = 1;
 
     @PostMapping
-    public User createUser(@RequestBody User user) {
+    public User createUser(@Valid @RequestBody User user, HttpServletRequest request) {
         if (userIsValid(user)) {
             if (user.getName() == null || user.getName().isEmpty()) {
                 user.setName(user.getLogin());
+                log.info("Получен запрос к эндпоинту: '{} {}', Добавлен пользователь: '{}', Имя установлено: '{}'",
+                        request.getMethod(), request.getRequestURI(), user, user.getName());
             }
-            user.setId(getNextId());
+            user.setId(nextId);
+            nextId++;
             users.put(user.getId(), user);
+            log.info("Получен запрос к эндпоинту: '{} {}', Добавлен пользователь: '{}'",
+                    request.getMethod(), request.getRequestURI(), user);
         }
         return user;
     }
 
     @PutMapping
-    public User changedUser(@RequestBody User user) {
+    public User changedUser(@Valid @RequestBody User user, HttpServletRequest request) {
         if (userIsValid(user)) {
             if (users.containsKey(user.getId())) {
                 users.remove(user.getId());
                 users.put(user.getId(), user);
+                log.info("Получен запрос к эндпоинту: '{} {}', Изменен пользователь: '{}'",
+                        request.getMethod(), request.getRequestURI(), user);
             } else {
                 throw new NotFoundException("Id not found");
             }
@@ -42,7 +54,7 @@ public class UserController {
     }
 
     @GetMapping
-    public ArrayList<User> getUsers() {
+    public List<User> getUsers() {
         return new ArrayList<>(users.values());
     }
 
@@ -59,9 +71,4 @@ public class UserController {
             return true;
         }
     }
-
-    private int getNextId(){
-        return nextId++;
-    }
-
 }
