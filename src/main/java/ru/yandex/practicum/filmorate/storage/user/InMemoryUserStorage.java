@@ -14,8 +14,8 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class InMemoryUserStorage implements UserStorage {
 
-    private final HashMap<Integer, User> users = new HashMap<>();
-    private Integer nextId = 1;
+    private final HashMap<Long, User> users = new HashMap<>();
+    private Long nextId = 1L;
 
     @Override
     public User save(User user) {
@@ -34,7 +34,7 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     @Override
-    public Optional<User> findUserById(Integer id) {
+    public Optional<User> findUserById(Long id) {
         if (users.containsKey(id)) {
             return Optional.of(users.get(id));
         } else {

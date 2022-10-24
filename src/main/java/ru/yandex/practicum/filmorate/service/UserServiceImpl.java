@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
@@ -17,7 +18,7 @@ public class UserServiceImpl implements UserService {
     private final UserStorage userStorage;
 
     @Autowired
-    public UserServiceImpl(UserStorage userStorage) {
+    public UserServiceImpl(@Qualifier("userDbStorage") UserStorage userStorage) {
         this.userStorage = userStorage;
     }
 
@@ -41,12 +42,12 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User findUserById(Integer id) {
+    public User findUserById(Long id) {
         return userStorage.findUserById(id).orElseThrow(() -> new NotFoundException("User not found"));
     }
 
     @Override
-    public User addFriend(Integer id, Integer friendId) {
+    public User addFriend(Long id, Long friendId) {
         User user = findUserById(id);
         User friend = findUserById(friendId);
         user.getFriends().add(friend.getId());
@@ -55,7 +56,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User deleteFriend(Integer id, Integer friendId) {
+    public User deleteFriend(Long id, Long friendId) {
         User user = findUserById(id);
         User friend = findUserById(friendId);
         if (user.getFriends().contains(friendId)) {
@@ -69,7 +70,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<User> getFriends(Integer id) {
+    public List<User> getFriends(Long id) {
         User user = findUserById(id);
         return user.getFriends().stream()
                 .map(this::findUserById)
@@ -77,10 +78,10 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<User> getMutualFriends(Integer id, Integer friendId) {
+    public List<User> getMutualFriends(Long id, Long friendId) {
         User user = findUserById(id);
         User friend = findUserById(friendId);
-        Set<Integer> mutualFriends = new HashSet<>(user.getFriends());
+        Set<Long> mutualFriends = new HashSet<>(user.getFriends());
         mutualFriends.retainAll(friend.getFriends());
         return mutualFriends.stream()
                 .map(this::findUserById)

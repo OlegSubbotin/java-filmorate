@@ -34,19 +34,19 @@ public class FilmServiceImpl implements FilmService {
     }
 
     @Override
-    public Film findFilmById(Integer id) {
+    public Film findFilmById(Long id) {
         return filmStorage.findFilmById(id).orElseThrow(() -> new NotFoundException("Film not found"));
     }
 
     @Override
-    public Film addLike(Integer id, Integer userId) {
+    public Film addLike(Long id, Long userId) {
         Film film = findFilmById(id);
         film.getLikes().add(userId);
         return filmStorage.save(film);
     }
 
     @Override
-    public Film deleteLike(Integer id, Integer userId) {
+    public Film deleteLike(Long id, Long userId) {
         Film film = findFilmById(id);
         if (film.getLikes().contains(userId)) {
             film.getLikes().remove(userId);
@@ -57,7 +57,7 @@ public class FilmServiceImpl implements FilmService {
     }
 
     @Override
-    public List<Film> getMostPopularFilms(Integer count) {
+    public List<Film> getMostPopularFilms(Long count) {
         List<Film> films = filmStorage.getAll();
         if (films.isEmpty()) {
             throw new ValidationException("List of films is empty");

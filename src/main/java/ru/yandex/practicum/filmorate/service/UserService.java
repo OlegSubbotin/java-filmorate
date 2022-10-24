@@ -11,13 +11,13 @@ public interface UserService {
 
     List<User> getAll();
 
-    User findUserById(Integer id);
+    User findUserById(Long id);
 
-    User addFriend(Integer id, Integer friendId);
+    User addFriend(Long id, Long friendId);
 
-    User deleteFriend(Integer id, Integer friendId);
+    User deleteFriend(Long id, Long friendId);
 
-    List<User> getFriends(Integer id);
+    List<User> getFriends(Long id);
 
-    List<User> getMutualFriends(Integer id, Integer friendId);
+    List<User> getMutualFriends(Long id, Long friendId);
 }

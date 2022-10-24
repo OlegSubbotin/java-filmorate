@@ -38,31 +38,31 @@ public class UserController {
     }
 
     @GetMapping("/{id}")
-    public User findUserById(@PathVariable @NotNull Integer id) {
+    public User findUserById(@PathVariable @NotNull Long id) {
         log.info("User id: {}", id);
         return userService.findUserById(id);
     }
 
     @PutMapping("/{id}/friends/{friendId}")
-    public User addFriend(@PathVariable @NotNull Integer id, @PathVariable @NotNull Integer friendId) {
+    public User addFriend(@PathVariable @NotNull Long id, @PathVariable @NotNull Long friendId) {
         log.info("User id: {}, friend id: {}", id, friendId);
         return userService.addFriend(id, friendId);
     }
 
     @DeleteMapping("/{id}/friends/{friendId}")
-    public User deleteFriend(@PathVariable @NotNull Integer id, @PathVariable @NotNull Integer friendId) {
+    public User deleteFriend(@PathVariable @NotNull Long id, @PathVariable @NotNull Long friendId) {
         log.info("User id: {}, friend id: {}", id, friendId);
         return userService.deleteFriend(id, friendId);
     }
 
     @GetMapping("/{id}/friends")
-    public List<User> getFriends(@PathVariable @NotNull Integer id) {
+    public List<User> getFriends(@PathVariable @NotNull Long id) {
         log.info("User id: {}", id);
         return userService.getFriends(id);
     }
 
     @GetMapping("/{id}/friends/common/{otherId}")
-    public List<User> getMutualFriends(@PathVariable @NotNull Integer id, @PathVariable @NotNull Integer otherId) {
+    public List<User> getMutualFriends(@PathVariable @NotNull Long id, @PathVariable @NotNull Long otherId) {
         log.info("User id: {}, other id: {}", id, otherId);
         return userService.getMutualFriends(id, otherId);
     }
