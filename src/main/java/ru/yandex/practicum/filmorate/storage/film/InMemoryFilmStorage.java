@@ -25,8 +25,28 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
+    public Film update(Film film) {
+        return null;
+    }
+
+    @Override
     public List<Film> getAll() {
         return new ArrayList<>(films.values());
+    }
+
+    @Override
+    public Film addLike(Long filmId, Long userId) {
+        return null;
+    }
+
+    @Override
+    public Film deleteLike(Long filmId, Long userId) {
+        return null;
+    }
+
+    @Override
+    public List<Film> getMostPopularFilms() {
+        return null;
     }
 
     @Override

@@ -1,21 +1,30 @@
 package ru.yandex.practicum.filmorate.service;
 
-import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
+import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-@RequiredArgsConstructor
 public class FilmServiceImpl implements FilmService {
 
     private final FilmStorage filmStorage;
+    private final UserStorage userStorage;
+
+    @Autowired
+    public FilmServiceImpl(@Qualifier("filmDbStorage") FilmStorage filmStorage,
+                           @Qualifier("userDbStorage") UserStorage userStorage) {
+        this.filmStorage = filmStorage;
+        this.userStorage = userStorage;
+    }
 
     @Override
     public Film create(Film film) {
@@ -24,8 +33,7 @@ public class FilmServiceImpl implements FilmService {
 
     @Override
     public Film update(Film film) {
-        findFilmById(film.getId());
-        return filmStorage.save(film);
+        return filmStorage.update(film);
     }
 
     @Override
@@ -39,21 +47,15 @@ public class FilmServiceImpl implements FilmService {
     }
 
     @Override
-    public Film addLike(Long id, Long userId) {
-        Film film = findFilmById(id);
-        film.getLikes().add(userId);
-        return filmStorage.save(film);
+    public Film addLike(Long filmId, Long userId) {
+        checkUserId(userId);
+        return filmStorage.addLike(filmId, userId);
     }
 
     @Override
-    public Film deleteLike(Long id, Long userId) {
-        Film film = findFilmById(id);
-        if (film.getLikes().contains(userId)) {
-            film.getLikes().remove(userId);
-            return filmStorage.save(film);
-        } else {
-            throw new NotFoundException("User don`t liked this film");
-        }
+    public Film deleteLike(Long filmId, Long userId) {
+        checkUserId(userId);
+        return filmStorage.deleteLike(filmId, userId);
     }
 
     @Override
@@ -63,5 +65,9 @@ public class FilmServiceImpl implements FilmService {
             throw new ValidationException("List of films is empty");
         }
         return films.stream().sorted(Comparator.comparing(Film::getRate).reversed()).limit(count).collect(Collectors.toList());
+    }
+
+    private void checkUserId(Long userId) {
+        userStorage.findUserById(userId).orElseThrow(() -> new NotFoundException("User not found"));
     }
 }

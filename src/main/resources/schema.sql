@@ -1,3 +1,10 @@
+CREATE TABLE IF NOT EXISTS mpa
+(
+    id   bigint PRIMARY KEY,
+    mpa_name varchar,
+    meaning varchar
+);
+
 CREATE TABLE IF NOT EXISTS film
 (
     id          bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
@@ -5,13 +12,14 @@ CREATE TABLE IF NOT EXISTS film
     description varchar,
     releaseDate date,
     duration    bigint,
-    rating      varchar
+    mpa_id bigint,
+    CONSTRAINT fk_film_mpa FOREIGN KEY (mpa_id) REFERENCES mpa(id)
 );
 
 CREATE TABLE IF NOT EXISTS users
 (
     id       bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    email    varchar,
+    email    varchar UNIQUE,
     login    varchar,
     name     varchar,
     birthday timestamp
@@ -19,7 +27,7 @@ CREATE TABLE IF NOT EXISTS users
 
 CREATE TABLE IF NOT EXISTS genre
 (
-    id   bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    id   bigint PRIMARY KEY,
     name varchar
 );
 
@@ -45,7 +53,6 @@ CREATE TABLE IF NOT EXISTS friends
 (
     user_id    bigint,
     friends_id bigint,
-    status     boolean,
     CONSTRAINT pk_friends PRIMARY KEY (user_id, friends_id),
     CONSTRAINT fk_friends_user FOREIGN KEY (user_id) REFERENCES users (id),
     CONSTRAINT fk_friends_friend FOREIGN KEY (friends_id) REFERENCES users (id)

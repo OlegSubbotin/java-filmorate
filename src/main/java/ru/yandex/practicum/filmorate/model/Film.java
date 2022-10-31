@@ -23,9 +23,15 @@ public class Film {
     private LocalDate releaseDate;
     @Positive
     private Integer duration;
-    Set<Long> likes = new HashSet<>();
+    private Set<Genre> genres;
+    private Mpa mpa;
+    private Set<Long> likes;
+    private Integer rate;
 
     public Integer getRate() {
+        if (likes == null) {
+            return 0;
+        }
         return likes.size();
     }
 }

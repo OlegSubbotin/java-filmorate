@@ -32,8 +32,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User update(User user) {
-        findUserById(user.getId());
-        return userStorage.save(user);
+        return userStorage.update(user);
     }
 
     @Override
@@ -48,25 +47,12 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User addFriend(Long id, Long friendId) {
-        User user = findUserById(id);
-        User friend = findUserById(friendId);
-        user.getFriends().add(friend.getId());
-        friend.getFriends().add(user.getId());
-        return userStorage.save(user);
+        return userStorage.addFriend(id, friendId);
     }
 
     @Override
     public User deleteFriend(Long id, Long friendId) {
-        User user = findUserById(id);
-        User friend = findUserById(friendId);
-        if (user.getFriends().contains(friendId)) {
-            user.getFriends().remove(friend.getId());
-            userStorage.save(user);
-            friend.getFriends().remove(user.getId());
-            userStorage.save(friend);
-            return user;
-        }
-        throw new ValidationException("User already not friend");
+       return userStorage.deleteFriend(id, friendId);
     }
 
     @Override
