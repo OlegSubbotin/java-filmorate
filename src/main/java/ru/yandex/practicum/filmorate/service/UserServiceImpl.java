@@ -1,11 +1,11 @@
 package ru.yandex.practicum.filmorate.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
-import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.storage.user.InMemoryUserStorage;
+import ru.yandex.practicum.filmorate.storage.friends.FriendsStorage;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
 import java.util.*;
@@ -16,9 +16,13 @@ public class UserServiceImpl implements UserService {
 
     private final UserStorage userStorage;
 
+    private final FriendsStorage friendsStorage;
+
     @Autowired
-    public UserServiceImpl(UserStorage userStorage) {
+    public UserServiceImpl(@Qualifier("userDbStorage") UserStorage userStorage,
+                           FriendsStorage friendsStorage) {
         this.userStorage = userStorage;
+        this.friendsStorage = friendsStorage;
     }
 
     @Override
@@ -31,8 +35,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User update(User user) {
-        findUserById(user.getId());
-        return userStorage.save(user);
+        return userStorage.update(user);
     }
 
     @Override
@@ -41,35 +44,24 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User findUserById(Integer id) {
+    public User findUserById(Long id) {
         return userStorage.findUserById(id).orElseThrow(() -> new NotFoundException("User not found"));
     }
 
     @Override
-    public User addFriend(Integer id, Integer friendId) {
-        User user = findUserById(id);
-        User friend = findUserById(friendId);
-        user.getFriends().add(friend.getId());
-        friend.getFriends().add(user.getId());
-        return userStorage.save(user);
+    public User addFriend(Long id, Long friendId) {
+        friendsStorage.addFriend(id, friendId);
+        return findUserById(id);
     }
 
     @Override
-    public User deleteFriend(Integer id, Integer friendId) {
-        User user = findUserById(id);
-        User friend = findUserById(friendId);
-        if (user.getFriends().contains(friendId)) {
-            user.getFriends().remove(friend.getId());
-            userStorage.save(user);
-            friend.getFriends().remove(user.getId());
-            userStorage.save(friend);
-            return user;
-        }
-        throw new ValidationException("User already not friend");
+    public User deleteFriend(Long id, Long friendId) {
+       friendsStorage.deleteFriend(id, friendId);
+        return findUserById(id);
     }
 
     @Override
-    public List<User> getFriends(Integer id) {
+    public List<User> getFriends(Long id) {
         User user = findUserById(id);
         return user.getFriends().stream()
                 .map(this::findUserById)
@@ -77,10 +69,10 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<User> getMutualFriends(Integer id, Integer friendId) {
+    public List<User> getMutualFriends(Long id, Long friendId) {
         User user = findUserById(id);
         User friend = findUserById(friendId);
-        Set<Integer> mutualFriends = new HashSet<>(user.getFriends());
+        Set<Long> mutualFriends = new HashSet<>(user.getFriends());
         mutualFriends.retainAll(friend.getFriends());
         return mutualFriends.stream()
                 .map(this::findUserById)

@@ -31,5 +31,12 @@ public class ControllerExceptionHandler {
         log.warn("MethodArgumentNotValidException: {}", ex.getMessage());
         return new ErrorResponse(ex.getMessage());
     }
+
+    @ExceptionHandler(ConflictException.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public ErrorResponse conflictException(ConflictException ex) {
+        log.warn("ConflictException: {}", ex.getMessage());
+        return new ErrorResponse(ex.getMessage());
+    }
 }
 

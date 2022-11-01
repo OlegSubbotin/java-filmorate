@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.model;
 
+import lombok.Builder;
 import lombok.Data;
 import ru.yandex.practicum.filmorate.validation.MinReleaseDate;
 
@@ -11,8 +12,9 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Data
+@Builder
 public class Film {
-    private Integer id;
+    private Long id;
     @NotBlank
     private String name;
     @Size(max = 200, message = "Description more 200 characters")
@@ -21,9 +23,15 @@ public class Film {
     private LocalDate releaseDate;
     @Positive
     private Integer duration;
-    Set<Integer> likes = new HashSet<>();
+    private Set<Genre> genres;
+    private Mpa mpa;
+    private Set<Long> likes;
+    private Integer rate;
 
     public Integer getRate() {
+        if (likes == null) {
+            return 0;
+        }
         return likes.size();
     }
 }
