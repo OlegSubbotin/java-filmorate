@@ -7,6 +7,7 @@ import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
+import ru.yandex.practicum.filmorate.storage.likes.LikesStorage;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
 import java.util.Comparator;
@@ -19,11 +20,15 @@ public class FilmServiceImpl implements FilmService {
     private final FilmStorage filmStorage;
     private final UserStorage userStorage;
 
+    private final LikesStorage likesStorage;
+
     @Autowired
     public FilmServiceImpl(@Qualifier("filmDbStorage") FilmStorage filmStorage,
-                           @Qualifier("userDbStorage") UserStorage userStorage) {
+                           @Qualifier("userDbStorage") UserStorage userStorage,
+                           LikesStorage likesStorage) {
         this.filmStorage = filmStorage;
         this.userStorage = userStorage;
+        this.likesStorage = likesStorage;
     }
 
     @Override
@@ -49,13 +54,15 @@ public class FilmServiceImpl implements FilmService {
     @Override
     public Film addLike(Long filmId, Long userId) {
         checkUserId(userId);
-        return filmStorage.addLike(filmId, userId);
+        likesStorage.addLike(filmId, userId);
+        return filmStorage.findFilmById(filmId).orElseThrow(() -> new NotFoundException("User not found"));
     }
 
     @Override
     public Film deleteLike(Long filmId, Long userId) {
         checkUserId(userId);
-        return filmStorage.deleteLike(filmId, userId);
+        likesStorage.deleteLike(filmId, userId);
+        return filmStorage.findFilmById(filmId).orElseThrow(() -> new NotFoundException("Film not found"));
     }
 
     @Override

@@ -35,21 +35,6 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
-    public Film addLike(Long filmId, Long userId) {
-        return null;
-    }
-
-    @Override
-    public Film deleteLike(Long filmId, Long userId) {
-        return null;
-    }
-
-    @Override
-    public List<Film> getMostPopularFilms() {
-        return null;
-    }
-
-    @Override
     public Optional<Film> findFilmById(Long id) {
         if (films.containsKey(id)) {
             return Optional.of(films.get(id));

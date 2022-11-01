@@ -12,11 +12,5 @@ public interface FilmStorage {
 
     List<Film> getAll();
 
-    Film addLike(Long filmId, Long userId);
-
-    Film deleteLike(Long filmId, Long userId);
-
-    List<Film> getMostPopularFilms();
-
     Optional<Film> findFilmById(Long id);
 }

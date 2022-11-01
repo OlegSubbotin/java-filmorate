@@ -5,18 +5,15 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.exception.ConflictException;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
-import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Repository
 @RequiredArgsConstructor
@@ -68,26 +65,6 @@ public class UserDbStorage implements UserStorage {
         } catch (EmptyResultDataAccessException ex) {
             return Optional.empty();
         }
-    }
-
-    public User addFriend (Long userId, Long friendId) {
-        String sql = "INSERT INTO friends (USER_ID, FRIENDS_ID) VALUES (?, ?)";
-        try {
-            jdbcTemplate.update(sql, userId, friendId);
-        } catch (DataIntegrityViolationException ex) {
-            throw new NotFoundException("User not found or friendship already exist");
-        }
-        return findUserById(userId).orElseThrow(()-> new NotFoundException("User not found"));
-    }
-
-    public User deleteFriend (Long userId, Long friendId) {
-        String sql = "DELETE FROM FRIENDS WHERE FRIENDS_ID=? AND USER_ID=?";
-        try {
-            jdbcTemplate.update(sql, friendId, userId);
-        } catch (EmptyResultDataAccessException ex) {
-            throw new NotFoundException("User not found");
-        }
-        return findUserById(userId).orElseThrow(()-> new NotFoundException("User not found"));
     }
 
     private User mapRowUser(ResultSet rs, int rowNum) throws SQLException {

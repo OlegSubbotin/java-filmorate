@@ -4,9 +4,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
-import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.storage.user.InMemoryUserStorage;
+import ru.yandex.practicum.filmorate.storage.friends.FriendsStorage;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
 import java.util.*;
@@ -17,9 +16,13 @@ public class UserServiceImpl implements UserService {
 
     private final UserStorage userStorage;
 
+    private final FriendsStorage friendsStorage;
+
     @Autowired
-    public UserServiceImpl(@Qualifier("userDbStorage") UserStorage userStorage) {
+    public UserServiceImpl(@Qualifier("userDbStorage") UserStorage userStorage,
+                           FriendsStorage friendsStorage) {
         this.userStorage = userStorage;
+        this.friendsStorage = friendsStorage;
     }
 
     @Override
@@ -47,12 +50,14 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User addFriend(Long id, Long friendId) {
-        return userStorage.addFriend(id, friendId);
+        friendsStorage.addFriend(id, friendId);
+        return findUserById(id);
     }
 
     @Override
     public User deleteFriend(Long id, Long friendId) {
-       return userStorage.deleteFriend(id, friendId);
+       friendsStorage.deleteFriend(id, friendId);
+        return findUserById(id);
     }
 
     @Override
